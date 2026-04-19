@@ -1,4 +1,4 @@
-﻿-- Infinite Yiff
+-- Infinite Yiff
 -- Modular UI injected into monolithic Core
 local Modules = {}
 local function require(name)
@@ -5644,148 +5644,13 @@ CMDs[#CMDs + 1] = {NAME = 'credits', DESC = 'Shows Infinite Yiff credits'}
 CMDs[#CMDs + 1] = {NAME = 'vpos [top/bottom/middle]', DESC = 'Moves the visualizer bar'}
 CMDs[#CMDs + 1] = {NAME = 'telekinesis', DESC = 'Grants a gear that can grapple and manipulate objects at a distance.'}
 CMDs[#CMDs + 1] = {NAME = 'cmds', DESC = 'Opens the massive command list browser UI.'}
-
-addcmd("flyfling", {}, function(args, speaker)
-	execCmd("unvehiclefly\\unwalkfling")
-	task.wait()
-	vehicleflyspeed = tonumber(args[1]) or vehicleflyspeed
-	execCmd("vehiclefly\\walkfling")
-end)
-
-addcmd("unflyfling", {}, function(args, speaker)
-	execCmd("unvehiclefly\\unwalkfling\\breakvelocity")
-end)
-
-addcmd("toggleflyfling", {}, function(args, speaker)
-	execCmd(flinging and "unflyfling" or "flyfling")
-end)
-
-walkflinging = false
-addcmd("walkfling", {}, function(args, speaker)
-	execCmd("unwalkfling")
-	local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
-	if humanoid then
-		humanoid.Died:Connect(function()
-			execCmd("unwalkfling")
-		end)
-	end
-
-	execCmd("noclip nonotify")
-	walkflinging = true
-	repeat RunService.Heartbeat:Wait()
-		local character = speaker.Character
-		local root = getRoot(character)
-		local vel, movel = nil, 0.1
-
-		while not (character and character.Parent and root and root.Parent) do
-			RunService.Heartbeat:Wait()
-			character = speaker.Character
-			root = getRoot(character)
-		end
-
-		vel = root.Velocity
-		root.Velocity = vel * 10000 + Vector3.new(0, 10000, 0)
-
-		RunService.RenderStepped:Wait()
-		if character and character.Parent and root and root.Parent then
-			root.Velocity = vel
-		end
-
-		RunService.Stepped:Wait()
-		if character and character.Parent and root and root.Parent then
-			root.Velocity = vel + Vector3.new(0, movel, 0)
-			movel = movel * -1
-		end
-	until walkflinging == false
-end)
-
-addcmd("unwalkfling", {"nowalkfling"}, function(args, speaker)
-	walkflinging = false
-	execCmd("unnoclip nonotify")
-end)
-
-addcmd("togglewalkfling", {}, function(args, speaker)
-	execCmd(walkflinging and "unwalkfling" or "walkfling")
-end)
-
-addcmd('invisfling',{},function(args, speaker)
-	local ch = speaker.Character
-	ch:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false)
-	local prt=Instance.new("Model")
-	prt.Parent = speaker.Character
-	local z1 = Instance.new("Part")
-	z1.Name="Torso"
-	z1.CanCollide = false
-	z1.Anchored = true
-	local z2 = Instance.new("Part")
-	z2.Name="Head"
-	z2.Parent = prt
-	z2.Anchored = true
-	z2.CanCollide = false
-	local z3 =Instance.new("Humanoid")
-	z3.Name="Humanoid"
-	z3.Parent = prt
-	z1.Position = Vector3.new(0,9999,0)
-	speaker.Character=prt
-	wait(3)
-	speaker.Character=ch
-	wait(3)
-	local Hum = Instance.new("Humanoid")
-	z2:Clone()
-	Hum.Parent = speaker.Character
-	local root =  getRoot(speaker.Character)
-	for i,v in pairs(speaker.Character:GetChildren()) do
-		if v ~= root and  v.Name ~= "Humanoid" then
-			v:Destroy()
-		end
-	end
-	root.Transparency = 0
-	root.Color = Color3.new(1, 1, 1)
-	local invisflingStepped
-	invisflingStepped = RunService.Stepped:Connect(function()
-		if speaker.Character and getRoot(speaker.Character) then
-			getRoot(speaker.Character).CanCollide = false
-		else
-			invisflingStepped:Disconnect()
-		end
-	end)
-	sFLY()
-	workspace.CurrentCamera.CameraSubject = root
-	local bambam = Instance.new("BodyThrust")
-	bambam.Parent = getRoot(speaker.Character)
-	bambam.Force = Vector3.new(99999,99999*10,99999)
-	bambam.Location = getRoot(speaker.Character).Position
-end)
-
-addcmd("antifling", {}, function(args, speaker)
-	if antifling then
-		antifling:Disconnect()
-		antifling = nil
-	end
-	antifling = RunService.Stepped:Connect(function()
-		for _, player in pairs(Players:GetPlayers()) do
-			if player ~= speaker and player.Character then
-				for _, v in pairs(player.Character:GetDescendants()) do
-					if v:IsA("BasePart") then
-						v.CanCollide = false
-					end
-				end
-			end
-		end
-	end)
-end)
-
-addcmd("unantifling", {}, function(args, speaker)
-	if antifling then
-		antifling:Disconnect()
-		antifling = nil
-	end
-end)
-
-addcmd("toggleantifling", {}, function(args, speaker)
-	execCmd(antifling and "unantifling" or "antifling")
-end)
-
+CMDs[#CMDs + 1] = {NAME = 'flyfling [speed]', DESC = 'Basically the invisfling command but not invisible'}
+CMDs[#CMDs + 1] = {NAME = 'unflyfling', DESC = 'Disables the flyfling command'}
+CMDs[#CMDs + 1] = {NAME = 'walkfling', DESC = 'Basically fling but no spinning'}
+CMDs[#CMDs + 1] = {NAME = 'unwalkfling / nowalkfling', DESC = 'Disables walkfling'}
+CMDs[#CMDs + 1] = {NAME = 'invisfling', DESC = 'Enables invisible fling (the invis part is patched, try using the god command before using this)'}
+CMDs[#CMDs + 1] = {NAME = 'antifling', DESC = 'Disables player collisions to prevent you from being flung'}
+CMDs[#CMDs + 1] = {NAME = 'unantifling', DESC = 'Disables antifling'}
 for i = 1, #CMDs do
 	local newcmd = Example:Clone()
 	newcmd.Parent = CMDsF
@@ -7752,7 +7617,7 @@ end)
 
 addcmd('rejoin',{'rj'},function(args, speaker)
 	if #Players:GetPlayers() <= 1 then
-		Players.LocalPlayer:Kick("\nRejoining...")
+		Players.LocalPlayer:Kick("\nRejoining... DON'T LEAVE.")
 		wait()
 		TeleportService:Teleport(PlaceId, Players.LocalPlayer)
 	else
@@ -7767,7 +7632,7 @@ addcmd('autorejoin',{'autorj'},function(args, speaker)
 			Err:GetPropertyChangedSignal("Text"):Connect(function()
 				if Err.Text:sub(0, 12) == "Disconnected" then
 					if #Players:GetPlayers() <= 1 then
-						Players.LocalPlayer:Kick("\nRejoining...")
+						Players.LocalPlayer:Kick("\nRejoining... DON'T LEAVE.")
 						wait()
 						TeleportService:Teleport(PlaceId, Players.LocalPlayer)
 					else
@@ -13490,3 +13355,146 @@ execCmd = function(cmd, speaker)
         OriginalExec(cmd, speaker)
     end
 end
+
+addcmd("flyfling", {}, function(args, speaker)
+	execCmd("unvehiclefly\\unwalkfling")
+	task.wait()
+	vehicleflyspeed = tonumber(args[1]) or vehicleflyspeed
+	execCmd("vehiclefly\\walkfling")
+end)
+
+addcmd("unflyfling", {}, function(args, speaker)
+	execCmd("unvehiclefly\\unwalkfling\\breakvelocity")
+end)
+
+addcmd("toggleflyfling", {}, function(args, speaker)
+	execCmd(flinging and "unflyfling" or "flyfling")
+end)
+
+walkflinging = false
+addcmd("walkfling", {}, function(args, speaker)
+	execCmd("unwalkfling")
+	local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+	if humanoid then
+		humanoid.Died:Connect(function()
+			execCmd("unwalkfling")
+		end)
+	end
+
+	execCmd("noclip nonotify")
+	walkflinging = true
+	repeat RunService.Heartbeat:Wait()
+		local character = speaker.Character
+		local root = getRoot(character)
+		local vel, movel = nil, 0.1
+
+		while not (character and character.Parent and root and root.Parent) do
+			RunService.Heartbeat:Wait()
+			character = speaker.Character
+			root = getRoot(character)
+		end
+
+		vel = root.Velocity
+		root.Velocity = vel * 10000 + Vector3.new(0, 10000, 0)
+
+		RunService.RenderStepped:Wait()
+		if character and character.Parent and root and root.Parent then
+			root.Velocity = vel
+		end
+
+		RunService.Stepped:Wait()
+		if character and character.Parent and root and root.Parent then
+			root.Velocity = vel + Vector3.new(0, movel, 0)
+			movel = movel * -1
+		end
+	until walkflinging == false
+end)
+
+addcmd("unwalkfling", {"nowalkfling"}, function(args, speaker)
+	walkflinging = false
+	execCmd("unnoclip nonotify")
+end)
+
+addcmd("togglewalkfling", {}, function(args, speaker)
+	execCmd(walkflinging and "unwalkfling" or "walkfling")
+end)
+
+addcmd('invisfling',{},function(args, speaker)
+	local ch = speaker.Character
+	ch:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+	local prt=Instance.new("Model")
+	prt.Parent = speaker.Character
+	local z1 = Instance.new("Part")
+	z1.Name="Torso"
+	z1.CanCollide = false
+	z1.Anchored = true
+	local z2 = Instance.new("Part")
+	z2.Name="Head"
+	z2.Parent = prt
+	z2.Anchored = true
+	z2.CanCollide = false
+	local z3 =Instance.new("Humanoid")
+	z3.Name="Humanoid"
+	z3.Parent = prt
+	z1.Position = Vector3.new(0,9999,0)
+	speaker.Character=prt
+	wait(3)
+	speaker.Character=ch
+	wait(3)
+	local Hum = Instance.new("Humanoid")
+	z2:Clone()
+	Hum.Parent = speaker.Character
+	local root =  getRoot(speaker.Character)
+	for i,v in pairs(speaker.Character:GetChildren()) do
+		if v ~= root and  v.Name ~= "Humanoid" then
+			v:Destroy()
+		end
+	end
+	root.Transparency = 0
+	root.Color = Color3.new(1, 1, 1)
+	local invisflingStepped
+	invisflingStepped = RunService.Stepped:Connect(function()
+		if speaker.Character and getRoot(speaker.Character) then
+			getRoot(speaker.Character).CanCollide = false
+		else
+			invisflingStepped:Disconnect()
+		end
+	end)
+	sFLY()
+	workspace.CurrentCamera.CameraSubject = root
+	local bambam = Instance.new("BodyThrust")
+	bambam.Parent = getRoot(speaker.Character)
+	bambam.Force = Vector3.new(99999,99999*10,99999)
+	bambam.Location = getRoot(speaker.Character).Position
+end)
+
+addcmd("antifling", {}, function(args, speaker)
+	if antifling then
+		antifling:Disconnect()
+		antifling = nil
+	end
+	antifling = RunService.Stepped:Connect(function()
+		for _, player in pairs(Players:GetPlayers()) do
+			if player ~= speaker and player.Character then
+				for _, v in pairs(player.Character:GetDescendants()) do
+					if v:IsA("BasePart") then
+						v.CanCollide = false
+					end
+				end
+			end
+		end
+	end)
+end)
+
+addcmd("unantifling", {}, function(args, speaker)
+	if antifling then
+		antifling:Disconnect()
+		antifling = nil
+	end
+end)
+
+addcmd("toggleantifling", {}, function(args, speaker)
+	execCmd(antifling and "unantifling" or "antifling")
+end)
+
+
