@@ -1,4 +1,4 @@
--- Infinite Yiff
+﻿-- Infinite Yiff
 -- Modular UI injected into monolithic Core
 local Modules = {}
 local function require(name)
@@ -968,7 +968,7 @@ end
 CoreStub.GetCommandSuggestions = function(query)
     local matches = {}
     query = string.lower(query)
-    local args = string.split(query, " ")
+    local args = splitString(query, " ")
     
     if #args > 1 and args[1] ~= "" then
         local searchName = args[#args]
@@ -7617,7 +7617,7 @@ end)
 
 addcmd('rejoin',{'rj'},function(args, speaker)
 	if #Players:GetPlayers() <= 1 then
-		Players.LocalPlayer:Kick("\nRejoining... DON'T LEAVE.")
+		Players.LocalPlayer:Kick("\nRejoining...")
 		wait()
 		TeleportService:Teleport(PlaceId, Players.LocalPlayer)
 	else
@@ -7632,7 +7632,7 @@ addcmd('autorejoin',{'autorj'},function(args, speaker)
 			Err:GetPropertyChangedSignal("Text"):Connect(function()
 				if Err.Text:sub(0, 12) == "Disconnected" then
 					if #Players:GetPlayers() <= 1 then
-						Players.LocalPlayer:Kick("\nRejoining... DON'T LEAVE.")
+						Players.LocalPlayer:Kick("\nRejoining...")
 						wait()
 						TeleportService:Teleport(PlaceId, Players.LocalPlayer)
 					else
@@ -13314,7 +13314,7 @@ end)
 
 local OriginalExec = execCmd
 execCmd = function(cmd, speaker)
-    local args = string.split(string.lower(cmd), " ")
+    local args = splitString(string.lower(cmd), " ")
     if args[1] == 'telekinesis' then
         require("Telekinesis").Run()
         return
